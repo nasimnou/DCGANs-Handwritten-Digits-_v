@@ -1,0 +1,9 @@
+#save generator and discriminator in cuda
+g_model=generator_A().to(device)
+d_model=discriminator().to(device)
+
+#define criterion and optimizers
+
+criterion = torch.nn.BCELoss()
+D_optimizer = optim.Adam(d_model.parameters(),lr=0.0002)
+G_optimizer = optim.Adam(g_model.parameters(),lr=0.0002)
