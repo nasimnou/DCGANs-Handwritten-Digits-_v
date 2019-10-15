@@ -1,0 +1,73 @@
+n_update_dis=1
+n_update_gen=1
+print_every=10
+update_max=None
+
+####plot samples
+def sample_images(iteration):
+  plt.figure(figsize=(8,8))
+  plt.axis("off")
+  plt.title("Training Images")
+  noise=torch.Tensor(np.random.uniform(low=-1.0, high=1.0,size=(30,100))).to(device)
+  plt.imshow(np.transpose(vutils.make_grid( g_model(Variable(noise)).detach().to(device)[:30], padding=2, normalize=True).cpu(),(1,2,0)))
+  
+  
+#####Train############
+for epoch in range(20):
+  D_running_loss = 0.0
+  G_running_loss = 0.0
+  real_label=torch.ones((batch_size, 1))
+  real_label=real_label.to(device)
+  fake_label=torch.zeros((batch_size, 1))
+  fake_label=fake_label.to(device)
+ 
+  for i, (data,_) in enumerate(train_loader, 0):
+    # Select a random batch of real images
+    real_imgs=data.to(device)
+    
+    # Generate a batch of fake images
+    noise=torch.Tensor(np.random.uniform(low=-1.0, high=1.0,size=(batch_size,z_dim))).to(device)
+    gen_imgs=g_model(noise)
+
+
+    
+    # ---------------------
+    #  Train the Discriminator
+    # ---------------------
+
+    ## forward + backprop + loss :for real images
+    d_model.zero_grad()
+    real_v = d_model(real_imgs)
+    D_loss_real = criterion(real_v, real_label)
+    D_loss_real.backward()
+
+    ## forward + backprop + loss :for fake images
+    fake_v = d_model(gen_imgs.detach()) ###########really important for detach 
+    D_loss_fake = criterion(fake_v, fake_label)
+    D_loss_fake.backward()
+
+    #Total D_loss
+    D_loss=D_loss_real + D_loss_fake
+    ## update model params
+    D_optimizer.step()
+
+
+    # ---------------------
+    #  Train the Generator
+    # ---------------------
+ 
+  ## forward + backprop + loss :for real images
+    True_label = torch.ones((batch_size, 1)).to(device)
+
+    g_model.zero_grad()
+    gen_v=d_model(gen_imgs)
+    G_loss = criterion(gen_v, True_label)
+    G_loss.backward()
+    G_optimizer.step()
+
+
+  print ("epoch",epoch,"G_loss",G_loss.item(),"D_loss",D_loss.item())
+  sample_images(epoch)
+
+
+
