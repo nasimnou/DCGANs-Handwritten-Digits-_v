@@ -1,0 +1,15 @@
+####define params
+img_rows = 28
+img_cols = 28
+channels = 1
+img_shape = (img_rows, img_cols, channels)
+batch_size=30
+z_dim = 100
+
+
+# Set random seed for reproducibility
+manualSeed = 999
+#manualSeed = random.randint(1, 10000) # use if you want new results
+print("Random Seed: ", manualSeed)
+random.seed(manualSeed)
+torch.manual_seed(manualSeed)
